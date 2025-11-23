@@ -12,7 +12,8 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor(staticName = "of")
 public class Note {
-    private UUID id;
+    @Getter
+    private final UUID id = UUID.randomUUID();
     private String title;
     private String content;
 }
