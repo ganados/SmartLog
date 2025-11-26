@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +32,19 @@ public class NoteController {
         return noteService.getAllNotes();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public Note getNoteById(@PathVariable UUID id) {
         return noteService.getNoteById(id);
     }
 
+    @PutMapping("/{id}")
+    public Note updateNote(@PathVariable UUID id, @RequestBody Note note) {
+        Note existingNote = noteService.getNoteById(id);
+        if (existingNote == null) {
+            throw new RuntimeException("Note not found");
+        }
+        existingNote.setTitle(note.getTitle());
+        existingNote.setContent(note.getContent());
+        return existingNote;
+    }
 }

@@ -22,25 +22,33 @@ function App() {
     }
   };
 
-  const handleNoteCreated = (newNote) => {
-    setNotes([...notes, newNote]);
-    console.log("Updated notes:", notes);
-  };
+  const handleNoteSaved = (savedNote) => {
+    const existingNoteIndex = notes.findIndex((note) => note.id === savedNote.id);
+    if (existingNoteIndex !== -1) {
+      const updatedNotes = [...notes];
+      updatedNotes[existingNoteIndex] = savedNote;
+      setNotes(updatedNotes);
+    } else {
+    setNotes([...notes, savedNote]);
+  }
+};
+
+  const [selectedNote, setSelectedNote] = useState(null);
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>SmartLog Frontend</h1>
       </header>
-      <NoteForm2 onNoteCreated={handleNoteCreated} />
+      <NoteForm2 onNoteSaved={handleNoteSaved} selectedNote={selectedNote} />
       <h2>Note List</h2>
       <ul>
         {notes.map((note) => (
           <li key={note.id}>
             <h3>{note.title}</h3>
             {note.content && <ReactMarkdown>{note.content}</ReactMarkdown>}
-            <button onClick={() => console.log('Edit clicked for ID: ', note.id)}>Edit</button>
-            <button onClick={() => console.log('Delete clicked for ID: ', note.id)}>Delete</button>
+            <button onClick={() => setSelectedNote(note)}>Edit</button>
+            <button onClick={() => setSelectedNote(note)}>Delete</button>
           </li>
         ))}
       </ul>

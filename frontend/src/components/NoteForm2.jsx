@@ -1,23 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 
-function NoteForm2({ onNoteCreated }) {
+function NoteForm2({ onNoteSaved, selectedNote }) {
+  console.log("NoteForm2 received selectedNote:", selectedNote);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/notes", { title, content });
-      console.log("Note created", response.data);
-      onNoteCreated(response.data);
+      let response;
+      if (selectedNote) {
+          response = await axios.put(
+          `http://localhost:8080/api/notes/${selectedNote.id}`,
+          { title, content }
+        );
+        console.log("Updated note:", response.data);
+      } else {
+        response = await axios.post("http://localhost:8080/api/notes", {
+          title,
+          content,
+        });
+        console.log("Created note:", response.data);
+      }
+      onNoteSaved(response.data);
       setTitle("");
       setContent("");
     } catch (error) {
       console.error("Error creating note:", error);
     }
   };
+
+  useEffect(() => {
+    if (selectedNote) {
+      setTitle(selectedNote.title || "");
+      setContent(selectedNote.content || "");
+    } else {
+      setTitle("");
+      setContent("");
+    }
+  }, [selectedNote]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -39,7 +62,7 @@ function NoteForm2({ onNoteCreated }) {
         <h3>Preview:</h3>
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
-      <button type="submit">Create Note</button>
+      <button type="submit">{selectedNote ? "Update Note" : "Create Note"}</button>
     </form>
   );
 }
