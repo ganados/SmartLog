@@ -14,7 +14,7 @@ function App() {
 
   const fetchNotes = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/notes");
+      const response = await axios.get(`http://localhost:8080/api/notes`);
       console.log("Fetched notes:", response.data);
       setNotes(response.data);
     } catch (error) {
@@ -23,15 +23,24 @@ function App() {
   };
 
   const handleNoteSaved = (savedNote) => {
-    const existingNoteIndex = notes.findIndex((note) => note.id === savedNote.id);
+    const existingNoteIndex = notes.findIndex(
+      (note) => note.id === savedNote.id
+    );
     if (existingNoteIndex !== -1) {
       const updatedNotes = [...notes];
       updatedNotes[existingNoteIndex] = savedNote;
       setNotes(updatedNotes);
     } else {
-    setNotes([...notes, savedNote]);
-  }
-};
+      setNotes([...notes, savedNote]);
+    }
+  };
+
+  const handleNoteDeleted = async (deletedNote) => {
+    setNotes(notes.filter((note) => note.id !== deletedNote.id));
+    const response = await axios.delete(
+      `http://localhost:8080/api/notes/${deletedNote.id}`
+    );
+  };
 
   const [selectedNote, setSelectedNote] = useState(null);
 
@@ -48,28 +57,11 @@ function App() {
             <h3>{note.title}</h3>
             {note.content && <ReactMarkdown>{note.content}</ReactMarkdown>}
             <button onClick={() => setSelectedNote(note)}>Edit</button>
-            <button onClick={() => setSelectedNote(note)}>Delete</button>
+            <button onClick={() => handleNoteDeleted(note)}>Delete</button>
           </li>
         ))}
       </ul>
     </div>
   );
-
-  //   return (
-  //     <div className="App">
-  //       <h1>SmartLog</h1>
-  //       <NoteForm onNoteCreated={handleNoteCreated} />
-  //       <h2>Notes List</h2>
-  //       <ul>
-  //         {notes.map((note) => (
-  //           <li key={note.id}>
-  //             <h3>{note.title}</h3>
-  //             <ReactMarkdown>{note.content}</ReactMarkdown>
-  //           </li>
-  //         ))}
-  //       </ul>
-  //     </div>
-  //   );
 }
-
 export default App;

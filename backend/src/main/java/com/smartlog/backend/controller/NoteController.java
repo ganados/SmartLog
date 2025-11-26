@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,6 +46,16 @@ public class NoteController {
         }
         existingNote.setTitle(note.getTitle());
         existingNote.setContent(note.getContent());
+        return existingNote;
+    }
+
+    @DeleteMapping("/{id}")
+    public Note deleteNote(@PathVariable UUID id) {
+        Note existingNote = noteService.getNoteById(id);
+        if (existingNote == null) {
+            throw new RuntimeException("Note not found");
+        }
+        noteService.deleteNote(id);
         return existingNote;
     }
 }

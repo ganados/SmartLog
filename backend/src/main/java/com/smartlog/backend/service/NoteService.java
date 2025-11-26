@@ -27,4 +27,8 @@ public class NoteService {
                 .findFirst()
                 .orElse(null);
     }
+
+    public void deleteNote(UUID id) {
+        notes.removeIf(note -> note.getId().equals(id));
+    }
 }
