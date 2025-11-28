@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 import ReactMarkdown from "react-markdown";
 
-import NoteForm2 from "./components/NoteForm2";
+import NoteForm from "./components/NoteForm";
 
 function App() {
   const [notes, setNotes] = useState([]);
@@ -43,20 +43,47 @@ function App() {
   };
 
   const [selectedNote, setSelectedNote] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredNotes = notes.filter(
+    (note) =>
+      note.title.toLowerCase().includes(searchQuery) ||
+      (note.content && note.content.toLowerCase().includes(searchQuery))
+  );
+  const [summaries, setSummaries] = useState({});
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>SmartLog Frontend</h1>
       </header>
-      <NoteForm2 onNoteSaved={handleNoteSaved} selectedNote={selectedNote} />
+      <NoteForm onNoteSaved={handleNoteSaved} selectedNote={selectedNote} />
+      <input
+        type="text"
+        placeholder="Search notes..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value.toLocaleLowerCase())}
+      />
       <h2>Note List</h2>
       <ul>
-        {notes.map((note) => (
+        {filteredNotes.map((note) => (
           <li key={note.id}>
             <h3>{note.title}</h3>
             {note.content && <ReactMarkdown>{note.content}</ReactMarkdown>}
+            {summaries[note.id] && (
+              <div>
+                <h4>Summary:</h4>
+                <p>{summaries[note.id]}</p>
+              </div>
+            )}
             <button onClick={() => setSelectedNote(note)}>Edit</button>
+            <button
+              onClick={async () => {
+                const placeholderSummary = "Placeholder summary for this note";
+                setSummaries({ ...summaries, [note.id]: placeholderSummary });
+              }}
+            >
+              Summarize
+            </button>
             <button onClick={() => handleNoteDeleted(note)}>Delete</button>
           </li>
         ))}

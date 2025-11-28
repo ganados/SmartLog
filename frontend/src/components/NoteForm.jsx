@@ -1,49 +1,68 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import ReactMarkdown from "react-markdown"; // For preview
+import ReactMarkdown from "react-markdown";
 
-function NoteForm({ onNoteCreated }) {
-  // Prop for callback after create
+function NoteForm({ onNoteSaved, selectedNote }) {
+  console.log("NoteForm received selectedNote:", selectedNote);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/notes", {
-        title,
-        content,
-      });
-      onNoteCreated(response.data); // Callback to parent (e.g., refresh list)
-      setTitle(""); // Clear form
+      let response;
+      if (selectedNote) {
+          response = await axios.put(
+          `http://localhost:8080/api/notes/${selectedNote.id}`,
+          { title, content }
+        );
+        console.log("Updated note:", response.data);
+      } else {
+        response = await axios.post("http://localhost:8080/api/notes", {
+          title,
+          content,
+        });
+        console.log("Created note:", response.data);
+      }
+      onNoteSaved(response.data);
+      setTitle("");
       setContent("");
     } catch (error) {
       console.error("Error creating note:", error);
-      // TODO: User feedback (e.g., alert)
     }
   };
+
+  useEffect(() => {
+    if (selectedNote) {
+      setTitle(selectedNote.title || "");
+      setContent(selectedNote.content || "");
+    } else {
+      setTitle("");
+      setContent("");
+    }
+  }, [selectedNote]);
 
   return (
     <form onSubmit={handleSubmit}>
       <input
         type="text"
-        value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Note Title"
         required
+        value={title}
       />
       <textarea
-        value={content}
+        placeholder="Note Content"
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Markdown content..."
         rows={10}
         required
+        value={content}
       />
       <div>
         <h3>Preview:</h3>
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
-      <button type="submit">Create Note</button>
+      <button type="submit">{selectedNote ? "Update Note" : "Create Note"}</button>
     </form>
   );
 }

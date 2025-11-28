@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartlog.backend.model.Note;
 import com.smartlog.backend.service.NoteService;
 
+
 @RestController
 @RequestMapping("/api/notes")
 public class NoteController {
@@ -46,6 +47,7 @@ public class NoteController {
         }
         existingNote.setTitle(note.getTitle());
         existingNote.setContent(note.getContent());
+        noteService.updateNote(existingNote);
         return existingNote;
     }
 
@@ -58,4 +60,10 @@ public class NoteController {
         noteService.deleteNote(id);
         return existingNote;
     }
+
+    @GetMapping("/{id}/summary")
+    public String getNoteSummary(@PathVariable UUID id) {
+        return noteService.summarizeNote(id);
+    }
+    
 }
