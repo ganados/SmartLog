@@ -31,19 +31,41 @@ public class NoteService {
     }
 
     public void deleteNote(UUID id) {
+        Note existingNote = getNoteById(id);
+        if (existingNote == null) {
+            throw new RuntimeException("Note not found");
+        }
         noteRepository.deleteById(id);
     }
 
-    public void updateNote(Note note) {
-        noteRepository.save(note);
+    public Note updateNote(UUID id, Note note) {
+        Note existingNote = getNoteById(id);
+        if (existingNote == null) {
+            throw new RuntimeException("Note not found");
+        }
+        existingNote.setTitle(note.getTitle());
+        existingNote.setContent(note.getContent());
+        noteRepository.save(existingNote);
+        return existingNote;
     }
-    public String summarizeNote(UUID id) {
 
+    public String summarizeNote(UUID id) {
         Note note = getNoteById(id);
         if (note == null || note.getContent() == null || note.getContent().isEmpty()) {
             throw new RuntimeException("Note not found or content is empty");
         }
         String content = note.getContent();
-        return content.length() <= 100 ? content : content.substring(0, 100) + "...";
+
+        String[] sentences = content.split("(?<=[.!?])\\s+");
+        StringBuilder summary = new StringBuilder();
+        for (int i = 0; i < Math.min(3, sentences.length); i++) {
+            summary.append(sentences[i].trim()).append(" ");
+        }
+
+        if (sentences.length > 3) {
+            summary.append("...");
+        }
+
+        return summary.toString().trim();
     }
 }

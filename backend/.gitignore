@@ -16,5 +16,9 @@ frontend/build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Db
+backend/*.db
+*.db
+
 ### VS Code ###
 .vscode/

@@ -73,13 +73,21 @@ function App() {
               <div>
                 <h4>Summary:</h4>
                 <p>{summaries[note.id]}</p>
+                <button onClick={() => {
+                  const { [note.id]: _, ...newSummaries } = summaries;
+                  setSummaries(newSummaries);
+                }}>Close</button>
               </div>
             )}
             <button onClick={() => setSelectedNote(note)}>Edit</button>
             <button
               onClick={async () => {
-                const placeholderSummary = "Placeholder summary for this note";
-                setSummaries({ ...summaries, [note.id]: placeholderSummary });
+                try {
+                const response = await axios.get(`http://localhost:8080/api/notes/${note.id}/summary`);
+                setSummaries({ ...summaries, [note.id]: response.data });
+                } catch (error) {
+                  console.error("Error summarizing:", error);
+                }
               }}
             >
               Summarize

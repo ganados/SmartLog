@@ -41,24 +41,12 @@ public class NoteController {
 
     @PutMapping("/{id}")
     public Note updateNote(@PathVariable UUID id, @RequestBody Note note) {
-        Note existingNote = noteService.getNoteById(id);
-        if (existingNote == null) {
-            throw new RuntimeException("Note not found");
-        }
-        existingNote.setTitle(note.getTitle());
-        existingNote.setContent(note.getContent());
-        noteService.updateNote(existingNote);
-        return existingNote;
+        return noteService.updateNote(id, note);
     }
 
     @DeleteMapping("/{id}")
-    public Note deleteNote(@PathVariable UUID id) {
-        Note existingNote = noteService.getNoteById(id);
-        if (existingNote == null) {
-            throw new RuntimeException("Note not found");
-        }
+    public void deleteNote(@PathVariable UUID id) {
         noteService.deleteNote(id);
-        return existingNote;
     }
 
     @GetMapping("/{id}/summary")
